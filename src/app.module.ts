@@ -17,6 +17,9 @@ import { ConfigModule } from '@nestjs/config';
       database: process.env.DATABASE_NAME || 'aurastationdb',
       autoLoadEntities: true,
       synchronize: true,
+      ssl: process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
     }),
     UsersModule,
 
