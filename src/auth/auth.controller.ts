@@ -34,6 +34,7 @@ export class AuthController {
     return {
       message: 'Inicio de sesión exitoso',
       user,
+      accessToken,
     };
   }
 
