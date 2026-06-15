@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Res, Get, UseGuards, Req } from '@nestjs/common';
-import type { Response, Request } from 'express';
+import { Body, Controller, Post, Get, UseGuards, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -17,19 +17,8 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
   ) {
     const { accessToken, user } = await this.authService.login(loginDto);
-
-    const isProduction = process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'production';
-
-    res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
-    });
 
     return {
       message: 'Inicio de sesión exitoso',
@@ -39,15 +28,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-    const isProduction = process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'production';
-
-    res.clearCookie('access_token', {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
-      path: '/',
-    });
+  async logout() {
     return {
       message: 'Sesión cerrada exitosamente',
     };
