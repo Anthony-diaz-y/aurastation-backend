@@ -49,6 +49,12 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
 
+    if (!user.password) {
+      throw new UnauthorizedException(
+        'Esta cuenta usa inicio de sesión con Google',
+      );
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales incorrectas');
@@ -102,7 +108,8 @@ export class AuthService {
       });
     }
 
-    const { password, ...result } = user;
+    const result = { ...user };
+    delete result.password;
     return result;
   }
 }

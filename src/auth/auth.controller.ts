@@ -15,9 +15,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Body() loginDto: LoginDto,
-  ) {
+  async login(@Body() loginDto: LoginDto) {
     const { accessToken, user } = await this.authService.login(loginDto);
 
     return {
@@ -28,7 +26,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout() {
+  logout() {
     return {
       message: 'Sesión cerrada exitosamente',
     };

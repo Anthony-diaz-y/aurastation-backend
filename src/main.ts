@@ -23,4 +23,6 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3001);
   console.log('Servidor backend corrinedo en http://localhost:3001');
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Error starting application:', err);
+});

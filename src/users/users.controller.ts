@@ -10,13 +10,11 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Patch('me')
-  async updateProfile(
-    @Req() req: Request,
-    @Body() updateData: Partial<User>,
-  ) {
+  async updateProfile(@Req() req: Request, @Body() updateData: Partial<User>) {
     const payload = req['user'] as { sub: number; email: string };
     const updatedUser = await this.usersService.update(payload.sub, updateData);
-    const { password, ...result } = updatedUser;
+    const result = { ...updatedUser };
+    delete result.password;
     return result;
   }
 }

@@ -4,6 +4,7 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RegisterDto } from '../auth/dto/register.dto';
 import * as bcrypt from 'bcrypt';
+import { IGoogleUser } from '../providers/google/interfaces/google.interface';
 
 @Injectable()
 export class UsersService {
@@ -29,9 +30,11 @@ export class UsersService {
     const dataToUpdate = { ...updateData };
     if (dataToUpdate.password && dataToUpdate.password !== '••••••••') {
       const saltRounds = 10;
-      dataToUpdate.password = await bcrypt.hash(dataToUpdate.password, saltRounds);
+      dataToUpdate.password = await bcrypt.hash(
+        dataToUpdate.password,
+        saltRounds,
+      );
     } else {
-      // Si mandan los puntitos por defecto de contraseña sin cambiar, la removemos para no sobreescribirla
       delete dataToUpdate.password;
     }
     await this.userRepository.update(id, dataToUpdate);
@@ -40,5 +43,29 @@ export class UsersService {
       throw new Error('Usuario no encontrado');
     }
     return updatedUser;
+  }
+
+  async findOrCreateGoogleUser(googleUser: IGoogleUser): Promise<User> {
+    let user = await this.userRepository.findOneBy({
+      googleId: googleUser.googleId,
+    });
+    if (user) return user;
+
+    user = await this.userRepository.findOneBy({ email: googleUser.email });
+    if (user) {
+      user.googleId = googleUser.googleId;
+      user.provider = 'google';
+      return this.userRepository.save(user);
+    }
+
+    const newUser = this.userRepository.create({
+      email: googleUser.email,
+      name: `${googleUser.firstName} ${googleUser.lastName}`.trim(),
+      googleId: googleUser.googleId,
+      provider: 'google',
+      avatarId: 'happy',
+      streak: 1,
+    });
+    return this.userRepository.save(newUser);
   }
 }
