@@ -18,6 +18,46 @@ export class CalendarService {
     });
   }
 
+  async getDaysWithMeasurements(
+    userId: number,
+  ): Promise<
+    Record<
+      string,
+      {
+        id: number;
+        bpm: number;
+        registrationTime: string;
+        stressLevel?: string;
+      }[]
+    >
+  > {
+    const logs = await this.calendarLogRepository.find({
+      where: { userId },
+      order: { date: 'ASC', registrationTime: 'ASC' },
+    });
+
+    const result: Record<
+      string,
+      {
+        id: number;
+        bpm: number;
+        registrationTime: string;
+        stressLevel?: string;
+      }[]
+    > = {};
+    for (const log of logs) {
+      if (log.bpm == null) continue;
+      if (!result[log.date]) result[log.date] = [];
+      result[log.date].push({
+        id: log.id,
+        bpm: log.bpm,
+        registrationTime: log.registrationTime ?? '--:--',
+        stressLevel: log.stressLevel ?? undefined,
+      });
+    }
+    return result;
+  }
+
   async save(userId: number, dto: SaveCalendarLogDto): Promise<CalendarLog> {
     if (dto.id) {
       const existing = await this.calendarLogRepository.findOneBy({

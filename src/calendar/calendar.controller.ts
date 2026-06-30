@@ -15,6 +15,12 @@ export class CalendarController {
     return this.calendarService.findAll(payload.sub);
   }
 
+  @Get('days-with-measurements')
+  async getDaysWithMeasurements(@Req() req: Request) {
+    const payload = req['user'] as { sub: number; email: string };
+    return this.calendarService.getDaysWithMeasurements(payload.sub);
+  }
+
   @Post()
   async saveLog(@Req() req: Request, @Body() dto: SaveCalendarLogDto) {
     const payload = req['user'] as { sub: number; email: string };

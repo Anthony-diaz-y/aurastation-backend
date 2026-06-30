@@ -21,6 +21,25 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
+  async search(query: string, currentUserId: number): Promise<User[]> {
+    if (!query) {
+      return this.userRepository
+        .createQueryBuilder('user')
+        .where('user.id != :currentUserId', { currentUserId })
+        .limit(20)
+        .getMany();
+    }
+    return this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id != :currentUserId', { currentUserId })
+      .andWhere(
+        '(LOWER(user.name) LIKE LOWER(:query) OR LOWER(user.email) LIKE LOWER(:query))',
+        { query: `%${query}%` },
+      )
+      .limit(20)
+      .getMany();
+  }
+
   async create(registerDto: RegisterDto): Promise<User> {
     const user = this.userRepository.create(registerDto);
     return this.userRepository.save(user);

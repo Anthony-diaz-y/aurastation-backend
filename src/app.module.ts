@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CalendarModule } from './calendar/calendar.module';
+import { ShareModule } from './share/share.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CalendarModule } from './calendar/calendar.module';
     UsersModule,
     AuthModule,
     CalendarModule,
+    ShareModule,
   ],
   controllers: [],
   providers: [],
